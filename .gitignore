@@ -29,7 +29,7 @@ MANIFEST
 
 # Extras
 get_hash_data.py
-data/out/raw_data.csv
+data/in/_raw_data.csv
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
