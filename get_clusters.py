@@ -11,7 +11,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 from engine.models import RFM
 
-# %% Settings
+# Settings
 warnings.filterwarnings('ignore')
 
 option_settings = {
@@ -24,10 +24,15 @@ option_settings = {
 IN_PATH = 'data/in/'
 OUT_PATH = 'data/out/'
 
-#%% Load data
+# Import data
+dtypes_dict = {
+    'order_id': 'str',
+    'datetime': 'str',
+    'user_id': 'str'
+}
 filename = 'raw_data.csv'
-data = pd.read_csv(IN_PATH + filename)
-data.info()
+data = pd.read_csv(IN_PATH + filename, dtype=dtypes_dict)
+data.head()
 
 # %% Get RFM variables and scores
 model = RFM()
@@ -49,28 +54,29 @@ for i in range(1,11):
     model = KMeans(n_clusters = i, init = 'k-means++')
     model.fit(rfm_vars[['norm_frequency', 'norm_monetary', 'norm_recency']])
     WCSS.append(model.inertia_)
-fig = plt.figure(figsize = (7,7))
-plt.plot(range(1,11), WCSS, linewidth=4, markersize=12,marker='o',color = 'green')
+fig = plt.figure(figsize = (8, 5))
+plt.plot(range(1,11), WCSS, linewidth=4, markersize=7, marker='o', color = 'green')
 plt.xticks(np.arange(11))
 plt.xlabel("Number of clusters")
 plt.ylabel("WCSS")
-plt.title('Within Cluster Sum of Squares vs Number of Clusters')
+plt.title('Elbow Method')
 plt.show()
 
 # %% KMeans
 X_t = rfm_vars[norm_cols].copy()
-kmeans = KMeans(n_clusters=3, random_state=0).fit(X_t)
+kmeans = KMeans(n_clusters=4, random_state=0).fit(X_t)
 rfm_vars['cluster'] = kmeans.predict(X_t)
 
 new_values = {
-    2: '1. High',
-    0: '2. Mid',
-    1: '3. Low'
+    0: '1. High',
+    2: '2. Mid-High',
+    1: '3. Mid-Low',
+    3: '4. Low'
 }
 rfm_vars['_cluster'] = rfm_vars['cluster'].map(new_values) 
 
 # %% Boxplots
-fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(16, 6))
+fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(16, 7))
 sns.boxplot(x=rfm_vars['_cluster'], y=rfm_vars['recency'], ax=axes[0])
 sns.boxplot(x=rfm_vars['_cluster'], y=rfm_vars['frequency'], ax=axes[1])
 sns.boxplot(x=rfm_vars['_cluster'], y=rfm_vars['monetary'], ax=axes[2])
