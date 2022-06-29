@@ -3,13 +3,13 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from pandas.api.types import is_datetime64_dtype, is_numeric_dtype 
 
-class RFM:
+class RFM():
     def __init__(self, n_features=3):
         self._n_features = n_features
 
-    def get_vars(self, dataframe, user_col, date_col, order_col, ticket_col):
+    def get_vars(self, data, user_col, date_col, order_col, ticket_col):
         try:
-            _data = dataframe.copy()
+            _data = data.copy()
 
             # Get max date, frequency and monetary value table
             _left = pd.pivot_table(
@@ -47,13 +47,13 @@ class RFM:
         except Exception as ex:
             print(f'Exception: {ex}')
 
-    def get_scores(self, dataframe, r_col, f_col, m_col, q=3):
+    def get_scores(self, data, r_col, f_col, m_col, q=3):
         try:
-            _rfm = dataframe.copy()
+            _rfm = data.copy()
             # Create RFM variables
-            _rfm['r_score'] = pd.qcut(_rfm[rec_col].values, q=q, duplicates='drop')
-            _rfm['f_score'] = pd.qcut(_rfm[freq_col].values, q=q, duplicates='drop')
-            _rfm['m_score'] = pd.qcut(_rfm[mon_col].values, q=q, duplicates='drop')
+            _rfm['r_score'] = pd.qcut(_rfm[r_col].values, q=q, duplicates='drop')
+            _rfm['f_score'] = pd.qcut(_rfm[f_col].values, q=q, duplicates='drop')
+            _rfm['m_score'] = pd.qcut(_rfm[m_col].values, q=q, duplicates='drop')
 
             r = len(_rfm['r_score'].unique())
             f = len(_rfm['f_score'].unique())
