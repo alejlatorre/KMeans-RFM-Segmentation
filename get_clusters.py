@@ -55,7 +55,7 @@ rfm_vars.describe()
 WCSS = []
 for i in range(1,11):
     model = KMeans(n_clusters = i, init = 'k-means++')
-    model.fit(rfm_vars[['norm_frequency', 'norm_monetary', 'norm_recency']])
+    model.fit(rfm_vars[norm_cols])
     WCSS.append(model.inertia_)
 fig = plt.figure(figsize = (8, 5))
 plt.plot(range(1,11), WCSS, linewidth=4, markersize=7, marker='o', color = 'green')
