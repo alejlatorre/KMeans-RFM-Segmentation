@@ -7,7 +7,10 @@ import matplotlib.pyplot as plt
 
 from datetime import datetime
 from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import MinMaxScaler
+
+from yellowbrick.cluster import silhouette_visualizer
 
 from engine.models import RFM
 
@@ -62,25 +65,43 @@ plt.ylabel("WCSS")
 plt.title('Elbow Method')
 plt.show()
 
+# %% Silhouette score for k-values
+print('Silhouette score for:')
+for i in range(3, 11):
+    labels=KMeans(n_clusters=i, init='k-means++', random_state=0).fit(X_t).labels_
+    score=silhouette_score(X_t, labels, metric='euclidean', random_state=0)
+    print(f'{i} clusters: {score}')
+
+silhouette_visualizer(KMeans(n_clusters=3, random_state=0), X_t, colors='yellowbrick')
+plt.show()
+
 # %% KMeans
-X_t = rfm_vars[norm_cols].copy()
-kmeans = KMeans(n_clusters=4, random_state=0).fit(X_t)
-rfm_vars['cluster'] = kmeans.predict(X_t)
+kmeans = KMeans(n_clusters=3, random_state=0).fit(rfm_vars[norm_cols])
+rfm_vars['cluster'] = kmeans.predict(rfm_vars[norm_cols])
 
+# Boxplots
+fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(16, 7))
+sns.boxplot(x=rfm_vars['cluster'], y=rfm_vars['recency'], ax=axes[0])
+sns.boxplot(x=rfm_vars['cluster'], y=rfm_vars['frequency'], ax=axes[1])
+sns.boxplot(x=rfm_vars['cluster'], y=rfm_vars['monetary'], ax=axes[2])
+plt.suptitle('Variables per cluster')
+plt.show()
+
+# %% Mapping values
 new_values = {
-    0: '1. High',
-    2: '2. Mid-High',
-    1: '3. Mid-Low',
-    3: '4. Low'
+    2: '1. High',
+    0: '2. Mid',
+    1: '3. Low'
 }
-rfm_vars['_cluster'] = rfm_vars['cluster'].map(new_values) 
+rfm_vars['_cluster'] = rfm_vars['cluster'].map(new_values)
 
-# %% Boxplots
+# Boxplots
 fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(16, 7))
 sns.boxplot(x=rfm_vars['_cluster'], y=rfm_vars['recency'], ax=axes[0])
 sns.boxplot(x=rfm_vars['_cluster'], y=rfm_vars['frequency'], ax=axes[1])
 sns.boxplot(x=rfm_vars['_cluster'], y=rfm_vars['monetary'], ax=axes[2])
 plt.suptitle('Variables per cluster')
 plt.show()
+
 
 # %%
