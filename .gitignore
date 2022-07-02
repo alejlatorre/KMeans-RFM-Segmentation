@@ -29,6 +29,7 @@ MANIFEST
 
 # Extras
 get_hash_data.py
+get_clusters.R
 data/in/_raw_data.csv
 
 # PyInstaller
