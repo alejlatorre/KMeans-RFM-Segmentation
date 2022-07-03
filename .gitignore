@@ -31,6 +31,7 @@ MANIFEST
 get_hash_data.py
 get_clusters.R
 data/in/_raw_data.csv
+data/in/.Rhistory
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
